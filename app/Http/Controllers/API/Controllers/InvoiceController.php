@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Controllers;
 use App\Http\Controllers\Controller;
 use App\Mail\InvoiceMail;
 use App\Models\Invoice;
+use App\Models\EmailHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -226,6 +227,15 @@ class InvoiceController extends Controller
             'status'  => $invoice->status === 'draft' ? 'sent' : $invoice->status,
             'sent_at' => now(),
         ]);
+
+        // Log to history
+        EmailHistory::log(
+            tenantId:  $tenant->id,
+            to:        $toEmail,
+            subject:   $validated['subject'] ?? "Invoice #{$invoice->number}",
+            type:      'invoice',
+            relatedId: $invoice->id
+        );
 
         return response()->json([
             'success' => true,

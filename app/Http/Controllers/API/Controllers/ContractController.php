@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Controllers;
 use App\Http\Controllers\Controller;
 use App\Mail\ContractSigningMail;
 use App\Models\Contract;
+use App\Models\EmailHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -144,6 +145,15 @@ class ContractController extends Controller
                 subject:    $validated['subject'] ?? "Please sign: {$contract->title}",
                 message:    $validated['body'] ?? '',
             ));
+
+            // Log to history
+            EmailHistory::log(
+                tenantId:  $tenant->id,
+                to:        $toEmail,
+                subject:   $validated['subject'] ?? "Please sign: {$contract->title}",
+                type:      'contract',
+                relatedId: $contract->id
+            );
         }
 
         return response()->json([

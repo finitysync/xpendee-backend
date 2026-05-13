@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Controllers;
 use App\Http\Controllers\Controller;
 use App\Mail\ContractSignedMail;
 use App\Models\Contract;
+use App\Models\EmailHistory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -68,6 +69,15 @@ class PublicContractController extends Controller
         // Send OTP via email
         Mail::to($validated['email'])->send(
             new \App\Mail\OtpMail($plainOtp, $contract->title, $contract->tenant)
+        );
+
+        // Log to history
+        EmailHistory::log(
+            tenantId:  $contract->tenant_id,
+            to:        $validated['email'],
+            subject:   'Your Signing OTP Code',
+            type:      'otp',
+            relatedId: $contract->id
         );
 
         return response()->json([

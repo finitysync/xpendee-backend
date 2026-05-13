@@ -3,6 +3,7 @@
 use App\API\Controllers\AuthController;
 use App\Http\Controllers\API\Controllers\ClientController;
 use App\Http\Controllers\API\Controllers\ContractController;
+use App\Http\Controllers\API\Controllers\EmailHistoryController;
 use App\Http\Controllers\API\Controllers\ExpenseController;
 use App\Http\Controllers\API\Controllers\InvoiceController;
 use App\Http\Controllers\API\Controllers\PublicContractController;
@@ -76,4 +77,8 @@ Route::middleware(['auth:sanctum', 'tenant.active'])->group(function () {
     Route::put('/contracts/{id}',      [ContractController::class, 'update']);
     Route::delete('/contracts/{id}',   [ContractController::class, 'destroy']);
     Route::post('/contracts/{id}/send',[ContractController::class, 'send']);
+
+    // Email History
+    Route::get('/email-history',      [EmailHistoryController::class, 'index']);
+    Route::delete('/email-history/{id}', [EmailHistoryController::class, 'destroy']);
 });
